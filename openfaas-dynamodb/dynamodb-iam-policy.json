@@ -1,0 +1,14 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "OpenFaasFunctionAceessForDynamoDB",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem"
+            ],
+            "Resource": "arn:aws:dynamodb:eu-west-1:x-accountid-x:table/lookup_table"
+        }
+    ]
+}
