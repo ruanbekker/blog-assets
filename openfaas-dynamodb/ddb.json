@@ -1,0 +1,25 @@
+{
+    "AttributeDefinitions": [
+        {
+            "AttributeName": "hash_value",
+            "AttributeType": "S"
+        }
+    ],
+    "TableName": "lookup_table",
+    "KeySchema": [
+        {
+            "AttributeName": "hash_value",
+            "KeyType": "HASH"
+        }
+    ],
+    "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+    },
+    "Tags": [
+        {
+            "Key": "Name",
+            "Value": "lookup-table"
+        }
+    ]
+}
