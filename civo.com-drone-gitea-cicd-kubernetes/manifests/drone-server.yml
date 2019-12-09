@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: drone-pv
+  namespace: apps
+  labels:
+    name: drone-data
+    type: longhorn
+spec:
+  capacity:
+    storage: 5G
+  volumeMode: Filesystem
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  csi:
+    driver: io.rancher.longhorn
+    fsType: ext4
+    volumeAttributes:
+      numberOfReplicas: '3'
+      staleReplicaTimeout: '2880'
+    volumeHandle: drone-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drone-server-pv-claim
+  labels:
+    type: longhorn
+    app: drone-server
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drone-server
+spec:
+  ports:
+  - name: drone-server
+    port: 80
+    targetPort: 80
+  selector:
+    app: drone-server
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone-server
+  labels:
+    app: drone-server
+spec:
+  selector:
+    matchLabels:
+      app: drone-server
+      tier: drone-server
+  strategy:
+    #type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: drone-server
+        tier: drone-server
+    spec:
+      containers:
+      - image: drone/drone:1
+        name: drone-server
+        env:
+        - name: DRONE_DEBUG
+          value: "true"
+        - name: DRONE_ADMIN
+          value: "CHANGEME_DRONEUSER"
+        - name: DRONE_USER_CREATE
+          value: "username:CHANGEME_DRONEUSER,admin:true"
+        - name: DRONE_SERVER_PORT
+          value: ":80"
+        - name: DRONE_DATABASE_DRIVER
+          #value: sqlite3
+          value: "postgres"
+          # https://docs.drone.io/installation/reference/drone-database-driver/
+        - name: DRONE_DATABASE_DATASOURCE
+          #value: /data/database.sqlite
+          value: "postgres://postgres:MySecretPass@postgres:5432/postgres?sslmode=disable"
+        - name: DRONE_GIT_ALWAYS_AUTH
+          value: "false"
+        - name: DRONE_GITEA_SERVER
+          value: "http://gitea.CHANGEME_INGRESS_DOMAIN"
+        - name: DRONE_RPC_SECRET
+          value: "CHANGEME_DRONERPCSECRET"
+        - name: DRONE_SERVER_HOST
+          value: "drone.CHANGEME_INGRESS_DOMAIN"
+        - name: DRONE_HOST
+          value: "http://drone-server:80"
+        - name: DRONE_SERVER_PROTO
+          value: "http"
+        - name: DRONE_TLS_AUTOCERT
+          value: "false"
+        - name: DRONE_AGENTS_ENABLED
+          value: "true"
+        - name: DRONE_GITEA_CLIENT_ID
+          value: "CHANGEME_DRONECLIENTID"
+        - name: DRONE_GITEA_CLIENT_SECRET
+          value: "CHANGEME_DRONECLIENTSECRET"
+        ports:
+        - containerPort: 80
+          name: drone-server
+        volumeMounts:
+        - name: drone-server-persistent-storage
+          mountPath: /var/lib/drone
+      volumes:
+      - name: drone-server-persistent-storage
+        persistentVolumeClaim:
+          claimName: drone-server-pv-claim
