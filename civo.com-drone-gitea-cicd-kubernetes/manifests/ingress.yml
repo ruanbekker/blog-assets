@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: drone
+spec:
+  rules:
+  - host: drone.CHANGEME_INGRESS_DOMAIN
+    http:
+      paths:
+      - backend:
+          serviceName: drone-server
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gitea
+spec:
+  rules:
+  - host: gitea.CHANGEME_INGRESS_DOMAIN
+    http:
+      paths:
+      - backend:
+          serviceName: gitea
+          servicePort: 3000
