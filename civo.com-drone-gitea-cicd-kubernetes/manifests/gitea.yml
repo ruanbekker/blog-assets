@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gitea-pv
+  namespace: apps
+  labels:
+    name: gitea-data
+    type: longhorn
+spec:
+  capacity:
+    storage: 5G
+  volumeMode: Filesystem
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  csi:
+    driver: io.rancher.longhorn
+    fsType: ext4
+    volumeAttributes:
+      numberOfReplicas: '3'
+      staleReplicaTimeout: '2880'
+    volumeHandle: gitea-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitea-pv-claim
+  labels:
+    type: longhorn
+    app: gitea
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea
+spec:
+  ports:
+  - name: gitea
+    port: 3000
+    targetPort: 3000
+  selector:
+    app: gitea
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-ssh
+spec:
+  ports:
+  - name: gitea-ssh
+    port: 2222
+    targetPort: 22
+  selector:
+    app: gitea
+  type: LoadBalancer
+  #clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  labels:
+    app: gitea
+spec:
+  selector:
+    matchLabels:
+      app: gitea
+      tier: gitea
+  strategy:
+    #type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: gitea
+        tier: gitea
+    spec:
+      containers:
+      - image: gitea/gitea:1.8.1
+        name: gitea
+        env:
+        - name: APP_NAME
+          value: "Gitea"
+        - name: USER_UID
+          value: "1000"
+        - name: USER_GID
+          value: "1000"
+        - name: ROOT_URL
+          value: "https://gitea.INGRESS_DOMAIN"
+        - name: SSH_DOMAIN
+          value: "gitea.INGRESS_DOMAIN"
+        - name: SSH_PORT
+          value: "2222"
+        - name: HTTP_PORT
+          value: "3000"
+        - name: DB_TYPE
+          value: "postgres"
+        - name: DB_HOST
+          value: "postgres:5432"
+        - name: DB_NAME
+          value: "gitea"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWD
+          value: "MySecretPass"
+        ports:
+        - containerPort: 3000
+          name: gitea
+        - containerPort: 2222
+          name: gitea-ssh
+        volumeMounts:
+        - name: gitea-persistent-storage
+          mountPath: /data
+      volumes:
+      - name: gitea-persistent-storage
+        persistentVolumeClaim:
+          claimName: gitea-pv-claim
