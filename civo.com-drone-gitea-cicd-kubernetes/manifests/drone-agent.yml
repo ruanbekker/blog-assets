@@ -31,7 +31,7 @@ spec:
         - name: DRONE_RPC_SECRET
           value: "$CHANGEME_DRONERPCSECRET"
         - name: DRONE_RUNNER_CAPACITY
-          value: "2"
+          value: "3"
         - name: DOCKER_HOST
           value: "unix:///var/run/docker.sock"
         - name: DOCKER_MAX_PROCS
