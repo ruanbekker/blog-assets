@@ -29,7 +29,7 @@ spec:
         - name: DRONE_RPC_SERVER
           value: "http://drone-server:80"
         - name: DRONE_RPC_SECRET
-          value: "CHANGEME_DRONERPCSECRET"
+          value: "${CHANGEME_DRONERPCSECRET}"
         - name: DRONE_RUNNER_CAPACITY
           value: "2"
         - name: DOCKER_HOST
