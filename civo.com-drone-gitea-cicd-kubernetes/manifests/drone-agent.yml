@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone-agent
+  labels:
+    app: drone-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: drone-agent
+      tier: drone-agent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: drone-agent
+        tier: drone-agent
+    spec:
+      containers:
+      - image: drone/agent:1
+        args: ["agent"]
+        name: drone-agent
+        env:
+        - name: DRONE_RPC_SERVER
+          value: "http://drone-server:80"
+        - name: DRONE_RPC_SECRET
+          value: "CHANGEME_DRONERPCSECRET"
+        - name: DRONE_RUNNER_CAPACITY
+          value: "2"
+        - name: DOCKER_HOST
+          value: "unix:///var/run/docker.sock"
+        - name: DOCKER_MAX_PROCS
+          value: "1"
+        ports:
+        - containerPort: 8000
+          name: drone-agent
+        volumeMounts:
+        - mountPath: /var/run
+          name: dockersock
+      - image: docker:stable-dind
+        name: docker-in-docker
+        volumeMounts:
+          - name: dockersock
+            mountPath: "/var/run"
+            #mountPath: "/var/run/docker.sock"
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
