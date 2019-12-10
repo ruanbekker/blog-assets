@@ -98,9 +98,9 @@ spec:
         - name: USER_GID
           value: "1000"
         - name: ROOT_URL
-          value: "https://gitea.INGRESS_DOMAIN"
+          value: "https://gitea.$CHANGEME_INGRESSDOMAIN"
         - name: SSH_DOMAIN
-          value: "gitea.INGRESS_DOMAIN"
+          value: "gitea.$CHANGEME_INGRESSDOMAIN"
         - name: SSH_PORT
           value: "2222"
         - name: HTTP_PORT
@@ -114,7 +114,7 @@ spec:
         - name: DB_USER
           value: "postgres"
         - name: DB_PASSWD
-          value: "MySecretPass"
+          value: "$CHANGEME_POSTGRESSPASSWORD"
         ports:
         - containerPort: 3000
           name: gitea
