@@ -80,9 +80,9 @@ spec:
         - name: DRONE_DEBUG
           value: "true"
         - name: DRONE_ADMIN
-          value: "CHANGEME_DRONEUSER"
+          value: "$CHANGEME_DRONEUSER"
         - name: DRONE_USER_CREATE
-          value: "username:CHANGEME_DRONEUSER,admin:true"
+          value: "username:$CHANGEME_DRONEUSER,admin:true"
         - name: DRONE_SERVER_PORT
           value: ":80"
         - name: DRONE_DATABASE_DRIVER
@@ -91,15 +91,15 @@ spec:
           # https://docs.drone.io/installation/reference/drone-database-driver/
         - name: DRONE_DATABASE_DATASOURCE
           #value: /data/database.sqlite
-          value: "postgres://postgres:MySecretPass@postgres:5432/postgres?sslmode=disable"
+          value: "postgres://postgres:$CHANGEME_POSTGRESSPASSWORD@postgres:5432/postgres?sslmode=disable"
         - name: DRONE_GIT_ALWAYS_AUTH
           value: "false"
         - name: DRONE_GITEA_SERVER
-          value: "http://gitea.CHANGEME_INGRESS_DOMAIN"
+          value: "http://gitea.$CHANGEME_INGRESSDOMAIN"
         - name: DRONE_RPC_SECRET
-          value: "CHANGEME_DRONERPCSECRET"
+          value: "$CHANGEME_DRONERPCSECRET"
         - name: DRONE_SERVER_HOST
-          value: "drone.CHANGEME_INGRESS_DOMAIN"
+          value: "drone.$CHANGEME_INGRESSDOMAIN"
         - name: DRONE_HOST
           value: "http://drone-server:80"
         - name: DRONE_SERVER_PROTO
@@ -109,9 +109,9 @@ spec:
         - name: DRONE_AGENTS_ENABLED
           value: "true"
         - name: DRONE_GITEA_CLIENT_ID
-          value: "CHANGEME_DRONECLIENTID"
+          value: "$CHANGEME_DRONECLIENTID"
         - name: DRONE_GITEA_CLIENT_SECRET
-          value: "CHANGEME_DRONECLIENTSECRET"
+          value: "$CHANGEME_DRONECLIENTSECRET"
         ports:
         - containerPort: 80
           name: drone-server
