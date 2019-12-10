@@ -8,7 +8,7 @@ data:
   PGDATA: "/var/lib/postgresql/data"
   POSTGRES_DB: "gitea"
   POSTGRES_USER: "postgres"
-  POSTGRES_PASSWORD: "MySecretPass"
+  POSTGRES_PASSWORD: "$CHANGEME_POSTGRESSPASSWORD"
 ---
 apiVersion: v1
 kind: PersistentVolume
