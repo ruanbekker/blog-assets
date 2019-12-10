@@ -4,7 +4,7 @@ metadata:
   name: drone
 spec:
   rules:
-  - host: drone.CHANGEME_INGRESS_DOMAIN
+  - host: drone.$CHANGEME_INGRESSDOMAIN
     http:
       paths:
       - backend:
@@ -17,7 +17,7 @@ metadata:
   name: gitea
 spec:
   rules:
-  - host: gitea.CHANGEME_INGRESS_DOMAIN
+  - host: gitea.$CHANGEME_INGRESSDOMAIN
     http:
       paths:
       - backend:
