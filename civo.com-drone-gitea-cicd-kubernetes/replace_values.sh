@@ -25,6 +25,17 @@ check_drone_environment(){
   fi
 }
 
+if [ ${1} == "download" ] 
+then
+  mkdir -p /tmp/civo_cicd_tutorial/manifests
+  cd /tmp/civo_cicd_tutorial
+  curl -sL https://raw.githubusercontent.com/ruanbekker/blog-assets/master/civo.com-drone-gitea-cicd-kubernetes/manifests/postgres.yml -o manifests/postgres.yml
+  curl -sL https://raw.githubusercontent.com/ruanbekker/blog-assets/master/civo.com-drone-gitea-cicd-kubernetes/manifests/gitea.yml -o manifests/gitea.yml
+  curl -sL https://raw.githubusercontent.com/ruanbekker/blog-assets/master/civo.com-drone-gitea-cicd-kubernetes/manifests/drone-server.yml -o manifests/drone-server.yml
+  curl -sL https://raw.githubusercontent.com/ruanbekker/blog-assets/master/civo.com-drone-gitea-cicd-kubernetes/manifests/drone-agent.yml -o manifests/drone-agent.yml
+  curl -sL https://raw.githubusercontent.com/ruanbekker/blog-assets/master/civo.com-drone-gitea-cicd-kubernetes/manifests/ingress.yml -o manifests/ingress.yml
+fi
+
 if [ ${1} == "gitea" ] 
 then
   check_gitea_environment
